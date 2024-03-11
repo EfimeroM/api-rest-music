@@ -2,6 +2,7 @@ const { validationResult } = require("express-validator")
 const User = require("../models/User")
 const bcrypt = require("bcrypt")
 const jwt = require("../helpers/jwt")
+const fs = require("fs")
 
 const register = async (req, res) => {
   const params = req.body
@@ -117,8 +118,26 @@ const update = async (req, res) => {
   }
 }
 
-const upload = async (req, res) => {
-  return res.status(200).json({ status: "success", message: "Image uploaded" })
+const uploadImage = async (req, res) => {
+  if (!req.file) return res.status(404).json({ status: "error", message: "Error file not found" })
+
+  const fileName = req.file.originalname
+  const splitFile = fileName.split(".")
+  const fileExtension = splitFile[1]
+  if (!["png", "jpg", "jpeg", "gif"].includes(fileExtension)) {
+    fs.unlinkSync(req.file.path)
+    return res.status(400).json({ status: "error", message: "Error invalid file" })
+  }
+
+  try {
+
+    const userUpdated = await User.findOneAndUpdate({ _id: req.user._id }, { image: req.file.filename }, { new: true })
+    if (!userUpdated) return res.status(400).json({ status: "error", message: "Error updating user image" })
+
+    return res.status(200).json({ status: "success", message: "Image uploaded", user: userUpdated, file: req.file })
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: "Error updating user image" })
+  }
 }
 
 module.exports = {
@@ -126,5 +145,5 @@ module.exports = {
   login,
   profile,
   update,
-  upload
+  uploadImage
 }
