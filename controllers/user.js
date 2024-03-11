@@ -61,8 +61,21 @@ const login = async (req, res) => {
   }
 }
 
+const profile = async (req, res) => {
+  const { id } = req.params
+
+  try {
+    const userDb = await User.findById(id)
+    if (!userDb) return res.status(404).json({ status: "error", message: "User not found" })
+
+    return res.status(200).json({ status: "success", message: "User profile", user: userDb })
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: "Error to get profile user" })
+  }
+}
 
 module.exports = {
   register,
-  login
+  login,
+  profile
 }
