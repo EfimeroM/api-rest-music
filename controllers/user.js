@@ -3,6 +3,7 @@ const User = require("../models/User")
 const bcrypt = require("bcrypt")
 const jwt = require("../helpers/jwt")
 const fs = require("fs")
+const path = require("path")
 
 const register = async (req, res) => {
   const params = req.body
@@ -140,10 +141,21 @@ const uploadImage = async (req, res) => {
   }
 }
 
+const avatar = async (req, res) => {
+  const file = req.params.file
+  const filePath = `./uploads/avatars/${file}`
+
+  fs.stat(filePath, (error, exists) => {
+    if (!exists) return res.status(404).json({ status: "error", message: "Image not found", exists, file, filePath })
+    return res.sendFile(path.resolve(filePath))
+  })
+}
+
 module.exports = {
   register,
   login,
   profile,
   update,
-  uploadImage
+  uploadImage,
+  avatar
 }
