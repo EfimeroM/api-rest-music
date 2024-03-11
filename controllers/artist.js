@@ -31,25 +31,38 @@ const list = async (req, res) => {
   const page = parseInt(req.params.page) || 1
   const itemsPerPage = 5
 
-  const artistsDb = await Artist.find().sort("name").paginate(page, itemsPerPage)
-  if (!artistsDb) return res.status(404).json({ status: "error", message: "Artists not found" })
+  try {
+    const artistsDb = await Artist.find().sort("name").paginate(page, itemsPerPage)
+    if (!artistsDb) return res.status(404).json({ status: "error", message: "Artists not found" })
 
-  const total = await Artist.countDocuments()
+    const total = await Artist.countDocuments()
 
-  return res.status(200).json({
-    status: "success", message: "List Artist",
-    page,
-    pages: Math.ceil(total / itemsPerPage),
-    itemsPerPage,
-    total,
-    artist: artistsDb
-  })
-
+    return res.status(200).json({
+      status: "success", message: "List Artist",
+      page,
+      pages: Math.ceil(total / itemsPerPage),
+      itemsPerPage,
+      total,
+      artist: artistsDb
+    })
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: "Error to list artists" })
+  }
 }
 
+const update = async (req, res) => {
+  const { id } = req.params
+  const data = req.body
+
+  const artistUpdated = await Artist.findByIdAndUpdate(id, data, { new: true })
+  if(!artistUpdated) return res.status(404).json({ status: "error", message: "Artist not found" })
+
+  return res.status(200).json({ status: "success", message: "Artist updated", artist: artistUpdated })
+}
 
 module.exports = {
   save,
   one,
-  list
+  list,
+  update
 }
