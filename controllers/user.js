@@ -74,8 +74,57 @@ const profile = async (req, res) => {
   }
 }
 
+const update = async (req, res) => {
+  const userIdentity = req.user
+  const userToUpdate = req.body
+  // validate fields
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) return res.status(400).json({ status: "error", message: errors.array()[0].msg })
+
+  try {
+    const usersDb = await User.find({
+      $or: [
+        { email: userToUpdate.email.toLowerCase() },
+        { nick: userToUpdate.nick.toLowerCase() }
+      ]
+    })
+
+    //check data user duplicate
+    let userIsset = false
+    usersDb.forEach(user => {
+      if (user && user._id != userIdentity._id) userIsset = true
+    })
+    if (userIsset) return res.status(400).json({ status: "error", message: "User already exists" })
+
+    if (userToUpdate.password) {
+      userToUpdate.password = await bcrypt.hash(userToUpdate.password, 10)
+    } else {
+      delete userToUpdate.password
+    }
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: "Error user not found" })
+  }
+
+  try {
+    const userUpdated = await User.findByIdAndUpdate(userIdentity._id, userToUpdate, { new: true })
+    if (!userUpdated) return res.status(404).json({ status: "error", message: "User not found" })
+    //create new token
+    const token = jwt.createToken(userUpdated)
+
+    return res.status(200).json({ status: "success", message: "User updated", user: userUpdated, token })
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: "Error user not found" })
+  }
+}
+
+const upload = async (req, res) => {
+  return res.status(200).json({ status: "success", message: "Image uploaded" })
+}
+
 module.exports = {
   register,
   login,
-  profile
+  profile,
+  update,
+  upload
 }
