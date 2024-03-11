@@ -1,4 +1,5 @@
 const Artist = require("../models/Artist")
+const mongoosePagination = require("mongoose-pagination")
 
 const save = async (req, res) => {
   const params = req.body
@@ -27,7 +28,22 @@ const one = async (req, res) => {
 }
 
 const list = async (req, res) => {
-  return res.status(200).json({ status: "success", message: "List Artist" })
+  const page = parseInt(req.params.page) || 1
+  const itemsPerPage = 5
+
+  const artistsDb = await Artist.find().sort("name").paginate(page, itemsPerPage)
+  if (!artistsDb) return res.status(404).json({ status: "error", message: "Artists not found" })
+
+  const total = await Artist.countDocuments()
+
+  return res.status(200).json({
+    status: "success", message: "List Artist",
+    page,
+    pages: Math.ceil(total / itemsPerPage),
+    itemsPerPage,
+    total,
+    artist: artistsDb
+  })
 
 }
 
