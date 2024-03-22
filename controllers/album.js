@@ -26,7 +26,22 @@ const one = async (req, res) => {
   }
 }
 
+const list = async(req, res) =>{
+  const { artistId } = req.params
+  if(!artistId) return res.status(404).json({ status: "error", message: "Error artist not found" })
+
+  try {
+    const albumsDb = await Album.find({ artist: artistId }).populate("artist", "-__v")
+    if(!albumsDb) throw Error
+
+    res.status(200).json({ status: "success", message: "Get list of albums", albums: albumsDb })
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: "Error to get album" })
+  }
+}
+
 module.exports = {
   save,
-  one
+  one,
+  list
 }
