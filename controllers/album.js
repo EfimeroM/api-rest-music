@@ -26,13 +26,13 @@ const one = async (req, res) => {
   }
 }
 
-const list = async(req, res) =>{
+const list = async (req, res) => {
   const { artistId } = req.params
-  if(!artistId) return res.status(404).json({ status: "error", message: "Error artist not found" })
+  if (!artistId) return res.status(404).json({ status: "error", message: "Error artist not found" })
 
   try {
     const albumsDb = await Album.find({ artist: artistId }).populate("artist", "-__v")
-    if(!albumsDb) throw Error
+    if (!albumsDb) throw Error
 
     res.status(200).json({ status: "success", message: "Get list of albums", albums: albumsDb })
   } catch (error) {
@@ -40,8 +40,23 @@ const list = async(req, res) =>{
   }
 }
 
+const update = async (req, res) => {
+  const { albumId } = req.params
+  const data = req.body
+
+  try {
+    const albumUpdated = await Album.findByIdAndUpdate(albumId, data, { new: true })
+    if (!albumUpdated) return res.status(404).json({ status: "error", message: "Error album not found" })
+
+    res.status(200).json({ status: "success", message: "Update album", album: albumUpdated })
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: "Error to update album" })
+  }
+}
+
 module.exports = {
   save,
   one,
-  list
+  list,
+  update
 }
