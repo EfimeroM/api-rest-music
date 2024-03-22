@@ -4,6 +4,7 @@ const cors = require("cors")
 const UserRoutes = require("./routes/user")
 const ArtistRoutes = require("./routes/artist")
 const AlbumRoutes = require("./routes/album")
+const SongRoutes = require("./routes/song")
 const { PORT } = require("./config")
 
 connectionDb()
@@ -17,7 +18,8 @@ app.use(express.urlencoded({ extended: true }))
 app.use("/api/user", UserRoutes)
 app.use("/api/artist", ArtistRoutes)
 app.use("/api/album", AlbumRoutes)
+app.use("/api/song", SongRoutes)
 
-app.listen(PORT, ()=>{
+app.listen(PORT, () => {
   console.log(`Initialized server on port: ${PORT}`)
 })
