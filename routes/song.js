@@ -6,5 +6,6 @@ const router = express.Router()
 
 router.post("/save", check.auth, SongController.save)
 router.get("/one/:id", check.auth, SongController.one)
+router.get("/list/:albumId", check.auth, SongController.list)
 
 module.exports = router

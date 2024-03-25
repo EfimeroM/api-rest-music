@@ -26,7 +26,24 @@ const one = async (req, res) => {
   }
 }
 
+const list = async (req, res) => {
+  const { albumId } = req.params
+
+  try {
+    const songsDb = await Song
+                      .find({ album: albumId })
+                      .populate({ path: "album", populate: { path: "artist", model: "Artist" } })
+                      .sort("track")
+    if (!songsDb) res.status(404).json({ status: "error", message: "Error songs not found" })
+
+    res.status(200).json({ status: "success", message: "get list songs", songs: songsDb })
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: "Error to get songs" })
+  }
+}
+
 module.exports = {
   save,
-  one
+  one,
+  list
 }
