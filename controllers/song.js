@@ -56,9 +56,22 @@ const update = async (req, res) => {
   }
 }
 
+const remove = async(req, res) =>{
+  const { id } = req.params
+  try {
+    const songRemoved = await Song.findByIdAndDelete(id)
+    if(!songRemoved) res.status(404).json({ status: "error", message: "Error song not found" })
+
+    res.status(200).json({ status: "success", message: "deleted song", songRemoved })
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: "Error to delete song" })
+  }
+}
+
 module.exports = {
   save,
   one,
   list,
-  update
+  update,
+  remove
 }
