@@ -1,4 +1,6 @@
 const Song = require("../models/Song")
+const fs = require("fs")
+const path = require("path")
 
 const save = async (req, res) => {
   const params = req.body
@@ -68,10 +70,45 @@ const remove = async(req, res) =>{
   }
 }
 
+const uploadSong = async (req, res) => {
+  const { id } = req.params
+  if (!req.file) return res.status(404).json({ status: "error", message: "Error file not found" })
+
+  const fileName = req.file.originalname
+  const splitFile = fileName.split(".")
+  const fileExtension = splitFile[1]
+  if (!["mp3", "ogg"].includes(fileExtension)) {
+    fs.unlinkSync(req.file.path)
+    return res.status(400).json({ status: "error", message: "Error invalid file" })
+  }
+
+  try {
+
+    const songUpdated = await Song.findOneAndUpdate({ _id: id }, { file: req.file.filename }, { new: true })
+    if (!songUpdated) return res.status(400).json({ status: "error", message: "Error updating song file" })
+
+    return res.status(200).json({ status: "success", message: "Song file uploaded", song: songUpdated, file: req.file })
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: "Error updating song file" })
+  }
+}
+
+const audio = async (req, res) => {
+  const file = req.params.file
+  const filePath = `./uploads/songs/${file}`
+
+  fs.stat(filePath, (error, exists) => {
+    if (!exists) return res.status(404).json({ status: "error", message: "Song not found", exists, file, filePath })
+    return res.sendFile(path.resolve(filePath))
+  })
+}
+
 module.exports = {
   save,
   one,
   list,
   update,
-  remove
+  remove,
+  uploadSong,
+  audio
 }
