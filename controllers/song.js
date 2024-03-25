@@ -31,9 +31,9 @@ const list = async (req, res) => {
 
   try {
     const songsDb = await Song
-                      .find({ album: albumId })
-                      .populate({ path: "album", populate: { path: "artist", model: "Artist" } })
-                      .sort("track")
+      .find({ album: albumId })
+      .populate({ path: "album", populate: { path: "artist", model: "Artist" } })
+      .sort("track")
     if (!songsDb) res.status(404).json({ status: "error", message: "Error songs not found" })
 
     res.status(200).json({ status: "success", message: "get list songs", songs: songsDb })
@@ -42,8 +42,23 @@ const list = async (req, res) => {
   }
 }
 
+const update = async (req, res) => {
+  try {
+    const { id } = req.params
+    const data = req.body
+
+    const songUpdated = await Song.findByIdAndUpdate(id, data, { new: true })
+    if (!songUpdated) res.status(404).json({ status: "error", message: "Error song not found" })
+
+    res.status(200).json({ status: "success", message: "update song", songUpdated })
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: "Error to update song" })
+  }
+}
+
 module.exports = {
   save,
   one,
-  list
+  list,
+  update
 }
