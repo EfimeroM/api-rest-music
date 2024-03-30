@@ -2,16 +2,11 @@ const express = require("express")
 const UserController = require("../controllers/user")
 const { validateRegisterInput, validateUpdateInput } = require("../middlewares/validateInputs")
 const check = require("../middlewares/auth")
-const multer = require("multer")
+const { configMulter } = require("../middlewares/multer")
 
 const router = express.Router()
 
-//config multer
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "./uploads/avatars"),
-  filename: (req, file, cb) => cb(null, `avatar-${Date.now()}-${file.originalname}`)
-})
-const uploads = multer({ storage })
+const uploads = configMulter("./uploads/avatars", "avatar")
 
 router.post("/register", validateRegisterInput, UserController.register)
 router.post("/login", UserController.login)

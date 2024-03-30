@@ -1,16 +1,11 @@
 const express = require("express")
 const ArtistController = require("../controllers/artist")
 const check = require("../middlewares/auth")
-const multer = require("multer")
+const { configMulter } = require("../middlewares/multer")
 
 const router = express.Router()
 
-//config multer
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "./uploads/artists"),
-  filename: (req, file, cb) => cb(null, `artist-${Date.now()}-${file.originalname}`)
-})
-const uploads = multer({ storage })
+const uploads = configMulter("./uploads/artists", "artist")
 
 router.post("/save", check.auth, ArtistController.save)
 router.get("/one/:id", check.auth, ArtistController.one)
