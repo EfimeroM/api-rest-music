@@ -1,13 +1,15 @@
-const Song = require("../models/Song")
 const fs = require("fs")
 const path = require("path")
+
+const Song = require("../models/Song")
+const { checkFileExtension } = require("../helpers/fileManager")
 
 const save = async (req, res) => {
   const params = req.body
 
   try {
     const songStored = await Song.create(params)
-    if (!songStored) throw Error
+    if (!songStored) throw new Error("Failed to create song")
 
     res.status(200).json({ status: "success", message: "Save user", song: songStored })
   } catch (error) {
@@ -58,11 +60,11 @@ const update = async (req, res) => {
   }
 }
 
-const remove = async(req, res) =>{
+const remove = async (req, res) => {
   const { id } = req.params
   try {
     const songRemoved = await Song.findByIdAndDelete(id)
-    if(!songRemoved) res.status(404).json({ status: "error", message: "Error song not found" })
+    if (!songRemoved) res.status(404).json({ status: "error", message: "Error song not found" })
 
     res.status(200).json({ status: "success", message: "deleted song", songRemoved })
   } catch (error) {
@@ -74,13 +76,8 @@ const uploadSong = async (req, res) => {
   const { id } = req.params
   if (!req.file) return res.status(404).json({ status: "error", message: "Error file not found" })
 
-  const fileName = req.file.originalname
-  const splitFile = fileName.split(".")
-  const fileExtension = splitFile[1]
-  if (!["mp3", "ogg"].includes(fileExtension)) {
-    fs.unlinkSync(req.file.path)
-    return res.status(400).json({ status: "error", message: "Error invalid file" })
-  }
+  const result = checkFileExtension(req.file, "audio")
+  if (!result) return res.status(400).json({ status: "error", message: "Error invalid file" })
 
   try {
 

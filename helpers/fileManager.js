@@ -7,8 +7,8 @@ const checkFileExtension = (file, fileType) => {
     case "image":
       extensions = ["png", "jpg", "jpeg", "gif"]
       break;
-    case "song":
-      extensions = ["mp3", "mp4"]
+    case "audio":
+      extensions = ["mp3", "ogg"]
       break;
     default:
       extensions = ["png", "jpg", "jpeg", "gif"]
