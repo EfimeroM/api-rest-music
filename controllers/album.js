@@ -1,4 +1,5 @@
 const Album = require("../models/Album")
+const Song = require("../models/Song")
 const fs = require("fs")
 const path = require("path")
 
@@ -89,11 +90,28 @@ const image = async (req, res) => {
   })
 }
 
+const remove = async (req, res) => {
+  const { id } = req.params
+
+  try {
+    //delete album and their songs
+    const albumRemoved = await Album.findByIdAndDelete(id)
+    if (!albumRemoved) return res.status(404).json({ status: "error", message: "Artist's album not found" })
+
+    const songsRemoved = await Song.deleteMany({ album: id })
+
+    return res.status(200).json({ status: "success", message: "Artist deleted", albumRemoved, songsRemoved })
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: "Error to delete album" })
+  }
+}
+
 module.exports = {
   save,
   one,
   list,
   update,
   uploadImage,
-  image
+  image,
+  remove
 }
