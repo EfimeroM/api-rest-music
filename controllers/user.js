@@ -1,18 +1,20 @@
 const { validationResult } = require("express-validator")
 const User = require("../models/User")
 const bcrypt = require("bcrypt")
+const { encryptPassword, comparePassword } = require("../helpers/bcrypt")
+const { checkFileExtension } = require("../helpers/fileManager")
 const jwt = require("../helpers/jwt")
 const fs = require("fs")
 const path = require("path")
 
 const register = async (req, res) => {
   const params = req.body
-  // validate fields
+  //validate fields
   const errors = validationResult(req)
   if (!errors.isEmpty()) return res.status(400).json({ status: "error", message: errors.array()[0].msg })
 
   try {
-    // check if the email or nickname already exists
+    //check if the email or nickname already exists
     const userExists = await User.find({
       $or: [
         { email: params.email.toLowerCase() },
@@ -21,8 +23,8 @@ const register = async (req, res) => {
     })
     if (userExists && userExists.length >= 1) return res.status(400).json({ status: "error", message: "Error the user already exists" })
 
-    //encrypt user password
-    params.password = await bcrypt.hash(params.password, 10)
+    //save encrypt user password
+    params.password = await encryptPassword(params.password)
 
     const userStored = await User.create(params)
     if (!userStored) throw Error
@@ -30,10 +32,7 @@ const register = async (req, res) => {
     //delete password, role and email
     const userIdentity = { ...userStored.toObject(), password: undefined, role: undefined, email: undefined }
 
-    return res.status(201).json({
-      status: "success", message: "User registered",
-      user: userIdentity
-    })
+    return res.status(201).json({ status: "success", message: "User registered", user: userIdentity })
   } catch (error) {
     return res.status(500).json({ status: "error", message: "Error to register user" })
   }
@@ -44,11 +43,12 @@ const login = async (req, res) => {
   if (!params.email || !params.password) return res.status(400).json({ status: "error", message: "Missing data error" })
 
   try {
+    //add password and role in query
     const userDb = await User.findOne({ email: params.email }).select("+password +role")
     if (!userDb) return res.status(404).json({ status: "error", message: "User not found" })
 
     //compare password
-    const pwd = bcrypt.compareSync(params.password, userDb.password)
+    const pwd = comparePassword(params.password, userDb.password)
     if (!pwd) return res.status(400).json({ status: "error", message: "User password is incorrect" })
 
     //clean password and role
@@ -79,11 +79,12 @@ const profile = async (req, res) => {
 const update = async (req, res) => {
   const userIdentity = req.user
   const userToUpdate = req.body
-  // validate fields
+  //validate fields
   const errors = validationResult(req)
   if (!errors.isEmpty()) return res.status(400).json({ status: "error", message: errors.array()[0].msg })
 
   try {
+    //check if email or nick already exists
     const usersDb = await User.find({
       $or: [
         { email: userToUpdate.email.toLowerCase() },
@@ -99,7 +100,7 @@ const update = async (req, res) => {
     if (userIsset) return res.status(400).json({ status: "error", message: "User already exists" })
 
     if (userToUpdate.password) {
-      userToUpdate.password = await bcrypt.hash(userToUpdate.password, 10)
+      userToUpdate.password = await encryptPassword(userToUpdate.password)
     } else {
       delete userToUpdate.password
     }
@@ -122,14 +123,9 @@ const update = async (req, res) => {
 const uploadImage = async (req, res) => {
   if (!req.file) return res.status(404).json({ status: "error", message: "Error file not found" })
 
-  const fileName = req.file.originalname
-  const splitFile = fileName.split(".")
-  const fileExtension = splitFile[1]
-  if (!["png", "jpg", "jpeg", "gif"].includes(fileExtension)) {
-    fs.unlinkSync(req.file.path)
-    return res.status(400).json({ status: "error", message: "Error invalid file" })
-  }
-
+  const result = checkFileExtension(req.file, "image")
+  if (!result) return res.status(400).json({ status: "error", message: "Error invalid file" })
+  
   try {
 
     const userUpdated = await User.findOneAndUpdate({ _id: req.user._id }, { image: req.file.filename }, { new: true })
