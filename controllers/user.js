@@ -1,11 +1,11 @@
 const { validationResult } = require("express-validator")
-const User = require("../models/User")
-const bcrypt = require("bcrypt")
-const { encryptPassword, comparePassword } = require("../helpers/bcrypt")
-const { checkFileExtension } = require("../helpers/fileManager")
-const jwt = require("../helpers/jwt")
 const fs = require("fs")
 const path = require("path")
+
+const User = require("../models/User")
+const jwt = require("../helpers/jwt")
+const { encryptPassword, comparePassword } = require("../helpers/bcrypt")
+const { checkFileExtension } = require("../helpers/fileManager")
 
 const register = async (req, res) => {
   const params = req.body
@@ -27,7 +27,7 @@ const register = async (req, res) => {
     params.password = await encryptPassword(params.password)
 
     const userStored = await User.create(params)
-    if (!userStored) throw Error
+    if (!userStored) throw new Error("Failed to create user")
 
     //delete password, role and email
     const userIdentity = { ...userStored.toObject(), password: undefined, role: undefined, email: undefined }
