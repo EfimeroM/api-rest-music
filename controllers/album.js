@@ -1,14 +1,16 @@
-const Album = require("../models/Album")
-const Song = require("../models/Song")
 const fs = require("fs")
 const path = require("path")
+
+const Album = require("../models/Album")
+const Song = require("../models/Song")
+const { checkFileExtension } = require("../helpers/fileManager")
 
 const save = async (req, res) => {
   const params = req.body
 
   try {
     const albumStored = await Album.create(params)
-    if (!albumStored) throw Error
+    if (!albumStored) throw new Error("Failed to create album")
 
     res.status(200).json({ status: "success", message: "Save Album", album: albumStored })
   } catch (error) {
@@ -21,7 +23,7 @@ const one = async (req, res) => {
 
   try {
     const albumDb = await Album.findById(id).populate("artist", "-__v")
-    if (!albumDb) throw Error
+    if (!albumDb) throw new Error("Failed to get album")
 
     res.status(200).json({ status: "success", message: "Get Album", album: albumDb })
   } catch (error) {
@@ -35,7 +37,7 @@ const list = async (req, res) => {
 
   try {
     const albumsDb = await Album.find({ artist: artistId }).populate("artist", "-__v")
-    if (!albumsDb) throw Error
+    if (!albumsDb) throw new Error("Error albums not found")
 
     res.status(200).json({ status: "success", message: "Get list of albums", albums: albumsDb })
   } catch (error) {
@@ -61,13 +63,8 @@ const uploadImage = async (req, res) => {
   const { id } = req.params
   if (!req.file) return res.status(404).json({ status: "error", message: "Error file not found" })
 
-  const fileName = req.file.originalname
-  const splitFile = fileName.split(".")
-  const fileExtension = splitFile[1]
-  if (!["png", "jpg", "jpeg", "gif"].includes(fileExtension)) {
-    fs.unlinkSync(req.file.path)
-    return res.status(400).json({ status: "error", message: "Error invalid file" })
-  }
+  const result = checkFileExtension(req.file, "image")
+  if (!result) return res.status(400).json({ status: "error", message: "Error invalid file" })
 
   try {
 
@@ -100,7 +97,7 @@ const remove = async (req, res) => {
 
     const songsRemoved = await Song.deleteMany({ album: id })
 
-    return res.status(200).json({ status: "success", message: "Artist deleted", albumRemoved, songsRemoved })
+    return res.status(200).json({ status: "success", message: "Albums and their songs deleted", albumRemoved, songsRemoved })
   } catch (error) {
     return res.status(500).json({ status: "error", message: "Error to delete album" })
   }
