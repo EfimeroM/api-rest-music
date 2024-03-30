@@ -73,12 +73,16 @@ const remove = async (req, res) => {
 
   try {
     const artistRemoved = await Artist.findByIdAndDelete(id)
-    const albumRemoved = await Album.find({ artist: artistRemoved._id }).remove()
-    //delete more albums
-    const songRemoved = await Song.find({ album: albumRemoved._id }).remove()
     if (!artistRemoved) return res.status(404).json({ status: "error", message: "Artist not found" })
+    
+    //delete albums and songs
+    const albumsDb = await Album.find({ artist: artistRemoved._id })
+    albumsDb.forEach(async (album) => {
+      await Song.deleteMany({ album: album._id })
+      await Album.findByIdAndDelete(album._id)
+    });
 
-    return res.status(200).json({ status: "success", message: "Artist deleted", artistRemoved, albumRemoved, songRemoved })
+    return res.status(200).json({ status: "success", message: "Artist deleted", artistRemoved })
   } catch (error) {
     return res.status(500).json({ status: "error", message: "Error to delete artist" })
   }
