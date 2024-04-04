@@ -1,0 +1,1085 @@
+#Config
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: API Music
+  description: API Rest Music - by Juan Martin Perez
+
+#Routes
+paths:
+  #User
+  /api/user/register:
+    post:
+      tags:
+        - User
+      summary: Create a new user
+      requestBody:
+        description: User data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "201":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+              examples:
+                userResponse:
+                  value:
+                    status: success
+                    message: User registered
+                    user:
+                      _id: 65ca5775e8c3296413a6c7ba
+                      name: Juan
+                      nick: juanperez1301
+                      image: avatar-1706215503076-mi-avatar.jpg
+  /api/user/login:
+    post:
+      tags:
+        - User
+      summary: Login a new user
+      requestBody:
+        description: User data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: juan@outlook.com
+                password:
+                  type: string
+                  example: pass_001
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                userResponse:
+                  value:
+                    status: success
+                    message: User loged
+                    user:
+                      _id: 660c502634a77c7160e35ca6
+                      name: Martin
+                      nick: martin9713
+                      email: martin@gmail.com
+                      image: default.jpg
+                    token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJfaWQiOiI2NjBjNTAyNjM0YTc3YzcxNjBlMzVjYTYiLCJuYW1lIjoiUGFibG8iLCJuaWNrIjoicGFibG85NzEzIiwiZW1haWwiOiJwYWJsb0BwYWJsby5jb20iLCJyb2xlIjoicm9sZV91c2VyIiwiaW1hZ2UiOiJkZWZhdWx0LmpwZyIsImlhdCI6MTcxMjA4MzIzMiwiZXhwIjoxNzE0Njc1MjMyfQ.lELgKth7ysiXzJlgr0IPwYKR_Lw0kmDFwRM7iMMFGNc
+  /api/user/profile/{id}:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - User
+      summary: Get User by id
+      parameters:
+        - name: id
+          in: path
+          description: user id
+          required: true
+          schema:
+            type: string
+            example: 660c502634a77c7160e35ca6
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                userResponse:
+                  value:
+                    status: success
+                    message: User profile
+                    user:
+                      _id: 660c502634a77c7160e35ca6
+                      name: Martin
+                      nick: martin9713
+                      email: martin@gmail.com
+                      image: default.jpg
+  /api/user/update:
+    put:
+      security:
+        - BearerAuth: []
+      tags:
+        - User
+      summary: Update my user
+      requestBody:
+        description: Example change a field
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: martin1@gmail.com
+                nick:
+                  type: string
+                  example: martinNew
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                userResponse:
+                  value:
+                    status: success
+                    message: User updated
+                    user:
+                      _id: 660c502634a77c7160e35ca6
+                      name: Martin
+                      nick: MartinNew
+                      email: martin1@gmail.com
+                      image: default.jpg
+                    token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJfaWQiOiI2NjBjNTAyNjM0YTc3YzcxNjBlMzVjYTYiLCJuYW1lIjoiUGFibG8iLCJuaWNrIjoicGFibG9uZXJ1ZGEiLCJlbWFpbCI6InBhYmxvQHBhYmxvLmNvbSIsImltYWdlIjoiZGVmYXVsdC5qcGciLCJpYXQiOjE3MTIwODM2MTEsImV4cCI6MTcxNDY3NTYxMX0.hYaAUp-hBLGzqMefwItKR9YLm5Cf64w207RGavuauqU
+  /api/user/upload:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - User
+      summary: Upload user image - avatar
+      requestBody:
+        description: file to upload
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file0:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                userResponse:
+                  value:
+                    status: success
+                    message: Image uploaded
+                    user:
+                      _id: 660c502634a77c7160e35ca6
+                      name: Martin
+                      nick: martin9713
+                      email: martin@gmail.com
+                      image: avatar-1706215503076-mi-avatar.jpg
+                    file:
+                      fieldname: file0
+                      originalname: profile.jpg
+                      encoding: 7bit
+                      mimetype: image/jpeg
+                      destination: ./uploads/avatars/
+                      filename: avatar-1708213120799-profile.jpg
+                      path: uploads\\avatars\\avatar-1708213120799-profile.jpg
+                      size: 9041
+  /api/user/avatar/{file}:
+    get:
+      tags:
+        - User
+      summary: Get User image by file name
+      parameters:
+        - name: file
+          in: path
+          description: file name
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            image/*:
+              example: <Binary Data for Image>
+              description: Return an image
+  #Artist
+  /api/artist/save:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Artist
+      summary: Create a new artist
+      requestBody:
+        description: Artist data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Artist"
+      responses:
+        "201":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Artist"
+              examples:
+                artistResponse:
+                  value:
+                    status: success
+                    message: Artist saved
+                    artist:
+                      _id: 660c560641c5b0734f87c2c5
+                      name: Three days grace
+                      description: Group of rock
+                      image: avatar-1706215503076-mi-avatar.jpg
+  /api/artist/one/{id}:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Artist
+      summary: Get Artist by id
+      parameters:
+        - name: id
+          in: path
+          description: artist id
+          required: true
+          schema:
+            type: string
+            example: 660c560641c5b0734f87c2c5
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                artistResponse:
+                  value:
+                    status: success
+                    message: Get an artist
+                    artist:
+                      _id: 660c560641c5b0734f87c2c5
+                      name: Three days grace
+                      description: Group of rock
+                      image: default.png
+  /api/artist/list/{page}:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Artist
+      summary: Get Artist's list by page
+      parameters:
+        - name: page
+          in: path
+          description: page of artist's list
+          required: false
+          schema:
+            type: number
+            example: 1
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                artistResponse:
+                  value:
+                    status: success
+                    message: List Artist
+                    page: 1
+                    pages: 1
+                    itemsPerPage: 5
+                    total: 2
+                    artists:
+                      [
+                        {
+                          "_id": "660c565a0d1229ed33d567d9",
+                          "name": "Three days grace",
+                          "description": "Band of rock",
+                          "image": "default.png",
+                        },
+                        {
+                          "_id": "660c560641c5b0734f87c2c5",
+                          "name": "Alesana",
+                          "description": "Group of rock",
+                          "image": "default.png",
+                        },
+                      ]
+  /api/artist/update/{id}:
+    put:
+      security:
+        - BearerAuth: []
+      tags:
+        - Artist
+      summary: Update Artist by id
+      parameters:
+        - name: id
+          in: path
+          description: artist id
+          required: true
+          schema:
+            type: string
+            example: 660c560641c5b0734f87c2c5
+      requestBody:
+        description: Example change a field
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Three days grace
+                description:
+                  type: string
+                  example: Group of punk
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                artistResponse:
+                  value:
+                    status: success
+                    message: Artist updated
+                    artist:
+                      _id: 660c560641c5b0734f87c2c5
+                      name: Three days grace
+                      description: Group of punk
+                      image: default.jpg
+  /api/artist/remove/{id}:
+    delete:
+      security:
+        - BearerAuth: []
+      tags:
+        - Artist
+      summary: Delete Artist by id
+      parameters:
+        - name: id
+          in: path
+          description: artist id
+          required: true
+          schema:
+            type: string
+            example: 660c560641c5b0734f87c2c5
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                artistResponse:
+                  value:
+                    status: success
+                    message: Artist and his albums and songs deleted
+                    artistRemoved:
+                      _id: 660c560641c5b0734f87c2c5
+                      name: Three days grace
+                      description: Group of punk
+                      image: default.jpg
+  /api/artist/upload/{id}:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Artist
+      summary: Upload artist image
+      parameters:
+        - name: id
+          in: path
+          description: artist id
+          required: true
+          schema:
+            type: string
+            example: 660c560641c5b0734f87c2c5
+      requestBody:
+        description: file to upload
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file0:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                artistResponse:
+                  value:
+                    status: success
+                    message: Image uploaded
+                    artist:
+                      _id: 660c565a0d1229ed33d567d9
+                      name: Three days grace
+                      description: Group of rock
+                      image: artist-1712085926636-As2w.png
+                    file:
+                      fieldname: file0
+                      originalname: As2w.png
+                      encoding: 7bit
+                      mimetype: image/jpeg
+                      destination: ./uploads/artists/
+                      filename: artist-1712085926636-As2w.png
+                      path: uploads\\artists\\artist-1712085926636-As2w.png
+                      size: 9041
+  /api/artist/image/{file}:
+    get:
+      tags:
+        - Artist
+      summary: Get Artist image by file name
+      parameters:
+        - name: file
+          in: path
+          description: file name
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            image/*:
+              example: <Binary Data for Image>
+              description: Return an image
+  #Album
+  /api/album/save:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Album
+      summary: Create a new album
+      requestBody:
+        description: Album data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Album"
+      responses:
+        "201":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Album"
+              examples:
+                albumResponse:
+                  value:
+                    status: success
+                    message: Save Album
+                    album:
+                      _id: 660c560641c5b0734f87c2c5
+                      artist: 660c565a0d1229ed33d567d9
+                      title: One-X
+                      description: Firs album punk
+                      year: 2011
+                      image: album-1706215503076-onex.jpg
+  /api/album/one/{id}:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Album
+      summary: Get Album by id
+      parameters:
+        - name: id
+          in: path
+          description: album id
+          required: true
+          schema:
+            type: string
+            example: 660c560641c5b0734f87c2c5
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                albumResponse:
+                  value:
+                    status: success
+                    message: Get Album
+                    album:
+                      _id: 660d9111b293d8611809db8c
+                      artist:
+                        _id: 660c565a0d1229ed33d567d9
+                        name: Three days grace
+                        description: Band of rock
+                        image: artist-1712085926636-three.png
+                      title: One-X
+                      description: Fist album punk
+                      year: 2011
+                      image: default.png
+  /api/album/list/{artistId}:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Album
+      summary: Get Albums by artist id
+      parameters:
+        - name: id
+          in: path
+          description: artist id
+          required: true
+          schema:
+            type: string
+            example: 660c560641c5b0734f87c2c5
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                albumResponse:
+                  value:
+                    status: success
+                    message: Get list of albums
+                    albums:
+                      [
+                        {
+                          "_id": "660d9111b293d8611809db8c",
+                          "artist":
+                            {
+                              "_id": "660c565a0d1229ed33d567d9",
+                              "name": "Three days grace",
+                              "description": "Band of rock",
+                              "image": "artist-1712085926636-three.png",
+                            },
+                          "title": "One-X",
+                          "description": "Fist album punk",
+                          "year": "2011",
+                          "image": "default.png",
+                        },
+                      ]
+  /api/album/update/{id}:
+    put:
+      security:
+        - BearerAuth: []
+      tags:
+        - Album
+      summary: Update album by id
+      parameters:
+        - name: id
+          in: path
+          description: album id
+          required: true
+          schema:
+            type: string
+            example: 660c560641c5b0734f87c2c5
+      requestBody:
+        description: Example change a field
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: Three days grace mod
+                description:
+                  type: string
+                  example: Group of punk mod
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                albumResponse:
+                  value:
+                    status: success
+                    message: Updated album
+                    artist: 660c565a0d1229ed33d567d9
+                    title: One-X
+                    description: First album punk
+                    year: 2011
+                    image: default.png
+  /api/album/upload/{id}:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Album
+      summary: Upload album image
+      parameters:
+        - name: id
+          in: path
+          description: album id
+          required: true
+          schema:
+            type: string
+            example: 660c560641c5b0734f87c2c5
+      requestBody:
+        description: file to upload
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file0:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                albumResponse:
+                  value:
+                    status: success
+                    message: Image uploaded
+                    album:
+                      _id: 660d9111b293d8611809db8c
+                      artist: 660c565a0d1229ed33d567d9
+                      title: One-X
+                      description: first album punk
+                      year: 2011
+                      image: album-1712166772168-onex.png
+                    file:
+                      fieldname: file0
+                      originalname: onex.png
+                      encoding: 7bit
+                      mimetype: image/jpeg
+                      destination: ./uploads/albums/
+                      filename: album-1712085926636-onex.png
+                      path: uploads\\albums\\album-1712085926636-onex.png
+                      size: 9041
+  /api/album/image/{file}:
+    get:
+      tags:
+        - Album
+      summary: Get album image by file name
+      parameters:
+        - name: file
+          in: path
+          description: file name
+          required: true
+          schema:
+            type: string
+            example: album-1712166772168-onex.png
+      responses:
+        "200":
+          description: OK
+          content:
+            image/*:
+              example: <Binary Data for Image>
+              description: Return an image
+  /api/album/remove/{id}:
+    delete:
+      security:
+        - BearerAuth: []
+      tags:
+        - Album
+      summary: Delete album by id
+      parameters:
+        - name: id
+          in: path
+          description: album id
+          required: true
+          schema:
+            type: string
+            example: 660c560641c5b0734f87c2c5
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                albumResponse:
+                  value:
+                    status: success
+                    message: Album and their songs deleted
+                    albumRemoved:
+                      _id: 660d9111b293d8611809db8c
+                      artist: 660c565a0d1229ed33d567d9
+                      title: One-X
+                      description: first album punk
+                      year: 2011
+                      image: album-1712166772168-onex.png
+                    songsRemoved:
+                      acknowledged: true
+                      deletedCount: 10
+  #Song
+  /api/song/save:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Song
+      summary: Create a new song
+      requestBody:
+        description: Song data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Song"
+      responses:
+        "201":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Song"
+              examples:
+                songResponse:
+                  value:
+                    status: success
+                    message: Saved song
+                    song:
+                      _id: 660c560641c5b0734f87c2c5
+                      album: 660dd6163b16b3c8b7b593ef
+                      track: 1
+                      name: Never too late
+                      duration: "3:30"
+                      file: "song.mp3"
+  /api/song/one/{id}:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Song
+      summary: Get song by id
+      parameters:
+        - name: id
+          in: path
+          description: song id
+          required: true
+          schema:
+            type: string
+            example: 660c560641c5b0734f87c2c5
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                songResponse:
+                  value:
+                    status: success
+                    message: get song
+                    song:
+                      _id: 660dd63b3b16b3c8b7b593f5
+                      album:
+                        {
+                          "_id": "660dd6163b16b3c8b7b593ef",
+                          "artist": "660c565a0d1229ed33d567d9",
+                          "title": "Poetics 1",
+                          "description": "primer disco de la banda",
+                          "year": 2010,
+                          "image": "default.png",
+                        }
+                      track: 1
+                      name: "Never too late"
+                      duration: "3:30"
+                      file: "song.mp3"
+  /api/song/list/{albumId}:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Song
+      summary: Get Songs by album id
+      parameters:
+        - name: albumId
+          in: path
+          description: album id
+          required: true
+          schema:
+            type: string
+            example: 660c560641c5b0734f87c2c5
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                songResponse:
+                  value:
+                    status: success
+                    message: get list of songs
+                    songs:
+                      [
+                        {
+                          "_id": "660dd63b3b16b3c8b7b593f5",
+                          "album":
+                            {
+                              "_id": "660dd6163b16b3c8b7b593ef",
+                              "artist":
+                                {
+                                  "_id": "660c565a0d1229ed33d567d9",
+                                  "name": "Three days grace",
+                                  "description": "Band of rock",
+                                  "image": "artist-1712085926636-three.png",
+                                },
+                              "title": "One-x",
+                              "description": "first album punk",
+                              "year": 2010,
+                              "image": "default.png",
+                            },
+                          "track": 1,
+                          "name": "Never too late",
+                          "duration": "03:30",
+                          "file": "song.mp3",
+                        },
+                      ]
+  /api/song/update/{id}:
+    put:
+      security:
+        - BearerAuth: []
+      tags:
+        - Song
+      summary: Update song by id
+      parameters:
+        - name: id
+          in: path
+          description: song id
+          required: true
+          schema:
+            type: string
+            example: 660c560641c5b0734f87c2c5
+      requestBody:
+        description: Example change a field
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Never too late mod
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                songResponse:
+                  value:
+                    status: success
+                    message: updated song
+                    songUpdated:
+                      _id: "660dd63b3b16b3c8b7b593f5"
+                      album: "660dd6163b16b3c8b7b593ef"
+                      track: 1
+                      name: "Never too late mod"
+                      duration: "03:30"
+                      file: "song.mp3"
+  /api/song/remove/{id}:
+    delete:
+      security:
+        - BearerAuth: []
+      tags:
+        - Song
+      summary: Delete song by id
+      parameters:
+        - name: id
+          in: path
+          description: song id
+          required: true
+          schema:
+            type: string
+            example: 660c560641c5b0734f87c2c5
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                songResponse:
+                  value:
+                    status: success
+                    message: deleted song
+                    songRemoved:
+                      _id: 660dd63b3b16b3c8b7b593f5
+                      album: 660dd6163b16b3c8b7b593ef
+                      track: 1
+                      name: "Never too late"
+                      duration: "03:30"
+                      file: "song.mp3"
+  /api/song/upload/{id}:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Song
+      summary: Upload song image
+      parameters:
+        - name: id
+          in: path
+          description: song id
+          required: true
+          schema:
+            type: string
+            example: 660c560641c5b0734f87c2c5
+      requestBody:
+        description: file to upload
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file0:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                albumResponse:
+                  value:
+                    status: success
+                    message: Song file uploaded
+                    song:
+                      _id: 660deab8ce65039516dc00fe
+                      album: 660dd6163b16b3c8b7b593ef
+                      track: 1
+                      name: Never too late
+                      duration: 03:30
+                      file: song-1712188753451-never-too-late.mp3
+                    file:
+                      fieldname: file0
+                      originalname: never-too-late.mp3
+                      encoding: 7bit
+                      mimetype: audio/mpeg
+                      destination: ./uploads/songs
+                      filename: song-1712188753451-never-too-late.mp3
+                      path: uploads\\songs\\song-1712188753451-never-too-late.mp3
+                      size: 2924975
+  /api/song/audio/{file}:
+    get:
+      tags:
+        - Song
+      summary: Get song by file name
+      parameters:
+        - name: file
+          in: path
+          description: file name
+          required: true
+          schema:
+            type: string
+            example: song-1712188753451-never-too-late.mp3
+      responses:
+        "200":
+          description: OK
+          content:
+            audio/mpeg:
+              example: <Binary Data for Audio>
+              description: Return an audio file
+
+#Schemas
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Martin
+        surname:
+          type: string
+          example: Perez
+        nick:
+          type: string
+          example: martin9713
+        email:
+          type: string
+          example: martin@gmail.com
+        password:
+          type: string
+          example: asFsw123
+        image:
+          type: string
+          example: "default.jpg"
+      required:
+        - name
+        - nick
+        - email
+        - password
+    Artist:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Three days grace
+        description:
+          type: string
+          example: Band of rock
+        image:
+          type: string
+          example: "default.png"
+      required:
+        - name
+    Album:
+      type: object
+      properties:
+        artist:
+          type: string
+          format: objectId
+          example: 65fc93418e423e9f00130c2c
+        title:
+          type: string
+          example: One-X
+        description:
+          type: string
+          example: First album punk
+        year:
+          type: number
+          example: 2011
+        image:
+          type: string
+          example: default.png
+      required:
+        - artist
+        - title
+        - year
+    Song:
+      type: object
+      properties:
+        album:
+          type: string
+          format: objectId
+          example: 65fc93418e423e9f00130c2c
+        track:
+          type: number
+          example: 1
+        name:
+          type: string
+          example: Never too late
+        duration:
+          type: string
+          example: 3:30
+        file:
+          type: string
+          example: song.mp3
+      required:
+        - album
+        - track
+        - name
+        - duration

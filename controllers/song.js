@@ -11,7 +11,7 @@ const save = async (req, res) => {
     const songStored = await Song.create(params)
     if (!songStored) throw new Error("Failed to create song")
 
-    res.status(200).json({ status: "success", message: "Save user", song: songStored })
+    res.status(201).json({ status: "success", message: "Saved song", song: songStored })
   } catch (error) {
     return res.status(500).json({ status: "error", message: "Error to save song" })
   }
@@ -40,7 +40,7 @@ const list = async (req, res) => {
       .sort("track")
     if (!songsDb) res.status(404).json({ status: "error", message: "Error songs not found" })
 
-    res.status(200).json({ status: "success", message: "get list songs", songs: songsDb })
+    res.status(200).json({ status: "success", message: "get list of songs", songs: songsDb })
   } catch (error) {
     return res.status(500).json({ status: "error", message: "Error to get songs" })
   }
@@ -54,7 +54,7 @@ const update = async (req, res) => {
     const songUpdated = await Song.findByIdAndUpdate(id, data, { new: true })
     if (!songUpdated) res.status(404).json({ status: "error", message: "Error song not found" })
 
-    res.status(200).json({ status: "success", message: "update song", songUpdated })
+    res.status(200).json({ status: "success", message: "updated song", songUpdated })
   } catch (error) {
     return res.status(500).json({ status: "error", message: "Error to update song" })
   }

@@ -3,7 +3,8 @@ const { Schema, model } = require("mongoose")
 const SongSchema = Schema({
   album: {
     type: Schema.ObjectId,
-    ref: "Album"
+    ref: "Album",
+    required: true
   },
   track: {
     type: Number,
@@ -20,7 +21,6 @@ const SongSchema = Schema({
   file: {
     type: String,
     default: "song.mp3"
-    //required: true
   },
   created_at: {
     type: Date,

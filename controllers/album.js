@@ -53,7 +53,7 @@ const update = async (req, res) => {
     const albumUpdated = await Album.findByIdAndUpdate(id, data, { new: true })
     if (!albumUpdated) return res.status(404).json({ status: "error", message: "Error album not found" })
 
-    res.status(200).json({ status: "success", message: "Update album", album: albumUpdated })
+    res.status(200).json({ status: "success", message: "Updated album", album: albumUpdated })
   } catch (error) {
     return res.status(500).json({ status: "error", message: "Error to update album" })
   }
@@ -97,7 +97,7 @@ const remove = async (req, res) => {
 
     const songsRemoved = await Song.deleteMany({ album: id })
 
-    return res.status(200).json({ status: "success", message: "Albums and their songs deleted", albumRemoved, songsRemoved })
+    return res.status(200).json({ status: "success", message: "Album and their songs deleted", albumRemoved, songsRemoved })
   } catch (error) {
     return res.status(500).json({ status: "error", message: "Error to delete album" })
   }
