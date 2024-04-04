@@ -36,7 +36,7 @@ local path: /api/docs
 
 ## My Social Links
 
-<a href="https://github.com/EfimeroM?tab=repositories" target="_blank" style="margin-right: 20px" >
+<a href="https://github.com/MartinPerezDev?tab=repositories" target="_blank" style="margin-right: 20px" >
   <img src="https://raw.githubusercontent.com/tandpfun/skill-icons/de91fca307a83d75fc5b1f6ce24540454acead41/icons/Github-Dark.svg" alt="LinkedIn Juan Martin Perez" width="30">
 </a>
 <a href="https://www.linkedin.com/in/juan-martin-perez/" target="_blank" style="margin-right: 20px">
